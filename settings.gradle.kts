@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Simple Colors Architecture"
 include(":app")
+include(":core")
