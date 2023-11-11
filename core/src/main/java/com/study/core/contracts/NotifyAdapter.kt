@@ -1,4 +1,4 @@
-package com.study.core.views
+package com.study.core.contracts
 
 interface NotifyAdapter {
 
