@@ -1,7 +1,6 @@
 package com.study.core.viewmodels
 
 import android.app.Application
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -17,7 +16,6 @@ import com.study.core.views.ARG_SCREEN
 import com.study.core.views.BaseScreen
 import com.study.core.views.LiveEvent
 import com.study.core.views.MutableLiveEvent
-import org.intellij.lang.annotations.Identifier
 
 open class CoreViewModel(
     private val application: Application
