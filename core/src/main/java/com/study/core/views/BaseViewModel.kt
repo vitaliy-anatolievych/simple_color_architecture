@@ -12,7 +12,7 @@ typealias MutableLiveEvent<T> = MutableLiveData<Event<T>>
 /**
  * Базовий клас для усіх [ViewModel]
  */
-class BaseViewModel: ViewModel() {
+open class BaseViewModel: ViewModel() {
 
     /**
      * Додай це метод у дочірній клас, якщо хочешь
