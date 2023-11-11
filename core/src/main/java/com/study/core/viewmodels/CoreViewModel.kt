@@ -16,9 +16,11 @@ import com.study.core.views.ARG_SCREEN
 import com.study.core.views.BaseScreen
 import com.study.core.views.LiveEvent
 import com.study.core.views.MutableLiveEvent
+import org.intellij.lang.annotations.Identifier
 
 open class CoreViewModel(
-    private val application: Application
+    private val application: Application,
+    @Identifier private val containerId: Int
 ): AndroidViewModel(application), Navigator, UiActions {
 
     val whenActivityActive = ResourceActions<AppCompatActivity>()
@@ -52,7 +54,6 @@ open class CoreViewModel(
         fragment.arguments = bundleOf(ARG_SCREEN to screen)
 
         val transaction = activity.supportFragmentManager.beginTransaction()
-        val root = activity.findViewById<View>(android.R.id.content)
 
         if (addToBackStack) transaction.addToBackStack(null)
         transaction
@@ -63,7 +64,7 @@ open class CoreViewModel(
                 R.anim.pop_exit
             )
 
-            .replace(root.id, fragment)
+            .replace(containerId, fragment)
             .commit()
     }
 }
