@@ -1,6 +1,7 @@
 package com.study.core.views
 
 import androidx.fragment.app.Fragment
+import com.study.core.contracts.NotifyAdapter
 
 /**
  * Базовий клас для усіх фрагментів
