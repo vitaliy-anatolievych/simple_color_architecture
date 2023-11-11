@@ -6,8 +6,10 @@ import com.study.simplecolorsarchitecture.model.colors.InMemoryColorsRepository
 
 class App: Application(), ModelsProvider {
 
+    private val dependency = listOf<Any>(
+        InMemoryColorsRepository()
+    )
+
     override val models: List<Any>
-        get() = listOf(
-            InMemoryColorsRepository()
-        )
+        get() = dependency
 }
