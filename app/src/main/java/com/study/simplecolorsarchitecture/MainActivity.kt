@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
+import com.study.core.contracts.NotifyAdapter
 import com.study.core.viewmodels.CoreViewModel
 import com.study.core.views.BaseFragment
 import com.study.simplecolorsarchitecture.views.contracts.HasScreenTitle
@@ -15,7 +16,7 @@ import com.study.simplecolorsarchitecture.views.screens.currentcolor.CurrentColo
 /**
  * Приклад реалізації Activity
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NotifyAdapter {
 
     /**
      * 1. Додається [CoreViewModel] та далі рееструється callback
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    fun notifyScreenUpdates() {
+    override fun notifyScreenUpdates() {
         val f = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
 
         if (supportFragmentManager.backStackEntryCount > 0) {
