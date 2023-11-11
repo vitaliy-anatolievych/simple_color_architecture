@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import com.study.core.R
 import com.study.core.contracts.Navigator
+import com.study.core.contracts.NotifyAdapter
 import com.study.core.contracts.UiActions
 import com.study.core.utils.Event
 import com.study.core.utils.ResourceActions
@@ -19,8 +20,7 @@ import com.study.core.views.MutableLiveEvent
 import org.intellij.lang.annotations.Identifier
 
 open class CoreViewModel(
-    private val application: Application,
-    @Identifier private val containerId: Int
+    private val application: Application
 ): AndroidViewModel(application), Navigator, UiActions {
 
     val whenActivityActive = ResourceActions<AppCompatActivity>()
@@ -64,7 +64,7 @@ open class CoreViewModel(
                 R.anim.pop_exit
             )
 
-            .replace(containerId, fragment)
+            .replace((activity as NotifyAdapter).containerId, fragment)
             .commit()
     }
 }
