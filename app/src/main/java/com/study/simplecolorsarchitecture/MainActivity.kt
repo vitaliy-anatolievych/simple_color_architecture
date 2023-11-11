@@ -66,6 +66,9 @@ class MainActivity : AppCompatActivity(), NotifyAdapter {
         return true
     }
 
+    override val containerId: Int
+        get() = R.id.fragmentContainer
+
     override fun notifyScreenUpdates() {
         val f = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
 
