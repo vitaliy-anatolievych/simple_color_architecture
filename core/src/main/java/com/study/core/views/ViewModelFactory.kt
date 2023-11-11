@@ -1,10 +1,37 @@
 package com.study.core.views
 
+import android.app.Application
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.savedstate.SavedStateRegistryOwner
+import com.study.core.contracts.ModelsProvider
+import com.study.core.viewmodels.CoreViewModel
 import java.lang.reflect.Constructor
+
+
+/**
+ * Use this method for getting view-models from your fragments
+ */
+inline fun <reified VM : ViewModel> BaseFragment.screenViewModel() = viewModels<VM> {
+    val application = requireActivity().application as ModelsProvider
+    val screen = requireArguments().getSerializable(ARG_SCREEN) as BaseScreen
+
+    // using Providers API directly for getting MainViewModel instance
+    val provider = ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory(application as Application))
+    val mainViewModel = provider[CoreViewModel::class.java]
+
+    // forming the list of available dependencies:
+    // - singleton scope dependencies (repositories) -> from App class
+    // - activity VM scope dependencies -> from MainViewModel
+    // - screen VM scope dependencies -> screen args
+    val dependencies = listOf(screen, mainViewModel) + application.models
+
+    // creating factory
+    ViewModelFactory(dependencies, this)
+}
 
 class ViewModelFactory(
     private val dependencies: List<Any>,
