@@ -18,7 +18,7 @@ import com.study.core.views.LiveEvent
 import com.study.core.views.MutableLiveEvent
 
 open class CoreViewModel(
-    application: Application
+    private val application: Application
 ): AndroidViewModel(application), Navigator, UiActions {
 
     val whenActivityActive = ResourceActions<AppCompatActivity>()
@@ -42,7 +42,7 @@ open class CoreViewModel(
     }
 
     override fun getString(messageRes: Int, vararg args: Any): String {
-        TODO()
+        return application.getString(messageRes, *args)
     }
 
     fun launchFragment(activity: AppCompatActivity, screen: BaseScreen, addToBackStack: Boolean = true) {
