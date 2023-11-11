@@ -1,13 +1,11 @@
 package com.study.simplecolorsarchitecture.views.screens.currentcolor
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import com.study.core.contracts.Navigator
 import com.study.core.contracts.UiActions
 import com.study.core.views.BaseViewModel
 import com.study.simplecolorsarchitecture.R
-import com.study.simplecolorsarchitecture.model.colors.ColorListener
 import com.study.simplecolorsarchitecture.model.colors.ColorsRepository
 import com.study.simplecolorsarchitecture.model.colors.NamedColor
 import com.study.simplecolorsarchitecture.views.screens.changecolor.ChangeColorFragment
