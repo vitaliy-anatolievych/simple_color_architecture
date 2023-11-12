@@ -1,7 +1,7 @@
 package com.study.core.views
 
 import androidx.fragment.app.Fragment
-import com.study.core.contracts.NotifyAdapter
+import com.study.core.contracts.FragmentsHolder
 
 /**
  * Базовий клас для усіх фрагментів
@@ -18,6 +18,6 @@ abstract class BaseFragment: Fragment() {
      * наприклад [ToolBar]
      */
     fun notifyScreenUpdates() {
-        (requireActivity() as NotifyAdapter).notifyScreenUpdates()
+        (requireActivity() as FragmentsHolder).notifyScreenUpdates()
     }
 }
