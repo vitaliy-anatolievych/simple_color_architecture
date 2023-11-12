@@ -19,8 +19,15 @@ import com.study.simplecolorsarchitecture.views.screens.currentcolor.CurrentColo
  */
 class MainActivity : AppCompatActivity(), FragmentsHolder {
 
+    /**
+     * 2. Оголосити сам навігатор, типу [StackFragmentNavigator]
+     */
     private lateinit var navigator: StackFragmentNavigator
 
+    /**
+     * 1. Створити [CoreViewModel] так передати UIActions та
+     * NavigatorManager
+     */
     private val activityViewModel by viewModelCreator<CoreViewModel> {
         CoreViewModel(
             uiActions = AndroidUIActions(applicationContext),
@@ -32,6 +39,7 @@ class MainActivity : AppCompatActivity(), FragmentsHolder {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // 3. Створити StackFragmentNavigator в onCreate
         navigator = StackFragmentNavigator(
             activity = this,
             navigatorManager = activityViewModel.navigatorManager,
@@ -53,6 +61,9 @@ class MainActivity : AppCompatActivity(), FragmentsHolder {
         return true
     }
 
+    /**
+     * 4. У notifyScreenUpdates прокинути navigator.notifyScreenUpdates()
+     */
     override fun notifyScreenUpdates() {
         navigator.notifyScreenUpdates()
         val f = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
@@ -65,6 +76,9 @@ class MainActivity : AppCompatActivity(), FragmentsHolder {
         }
     }
 
+    /**
+     * 5. Повернути єкземпляр класу [CoreViewModel] до Core модулю
+     */
     override fun getActivityScopeViewModel(): CoreViewModel {
         return activityViewModel
     }
