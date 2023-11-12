@@ -1,64 +1,51 @@
 package com.study.simplecolorsarchitecture
 
+import android.app.Activity
+import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
-import com.study.core.contracts.NotifyAdapter
+import com.study.core.contracts.FragmentsHolder
+import com.study.core.navigator.NavigatorManager
+import com.study.core.navigator.StackFragmentNavigator
+import com.study.core.uiactions.AndroidUIActions
+import com.study.core.utils.Animations
+import com.study.core.utils.viewModelCreator
 import com.study.core.viewmodels.CoreViewModel
-import com.study.core.views.BaseFragment
 import com.study.simplecolorsarchitecture.views.contracts.HasScreenTitle
 import com.study.simplecolorsarchitecture.views.screens.currentcolor.CurrentColorFragment
 
 /**
  * Приклад реалізації Activity
  */
-class MainActivity : AppCompatActivity(), NotifyAdapter {
+class MainActivity : AppCompatActivity(), FragmentsHolder {
 
-    /**
-     * 1. Додається [CoreViewModel] та далі рееструється callback
-     * на життевий цикл
-     */
-    private val activityViewModel by viewModels<CoreViewModel> {
-        ViewModelProvider.AndroidViewModelFactory(application)
+    private lateinit var navigator: StackFragmentNavigator
+
+    private val activityViewModel by viewModelCreator<CoreViewModel> {
+        CoreViewModel(
+            uiActions = AndroidUIActions(applicationContext),
+            navigatorManager = NavigatorManager(),
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
-            // початковий єкран якщо додаток відкрито вперше
-            activityViewModel.launchFragment(
-                activity = this,
-                screen = CurrentColorFragment.Screen(),
-                addToBackStack = false
-            )
-        }
+        navigator = StackFragmentNavigator(
+            activity = this,
+            navigatorManager = activityViewModel.navigatorManager,
+            savedInstanceState = savedInstanceState,
+            containerId = R.id.fragmentContainer,
+            animations = Animations(
+                enterAnim = R.anim.enter,
+                exitAnim = R.anim.exit,
+                popEnterAnim = R.anim.pop_enter,
+                popExitAnim = R.anim.pop_exit
+            ),
+            initialScreenCreator = { CurrentColorFragment.Screen() }
+        )
 
-        // реєстрація життевого циклу фрагменту
-        supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallbacks, false)
-    }
-
-    override fun onDestroy() {
-        // відписка від життевого циклу фрагменту
-        supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentCallbacks)
-        super.onDestroy()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // стає можливою навігація лише якщо acivity існує
-        activityViewModel.whenActivityActive.resource = this
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // стираємо посилання на acivity
-        activityViewModel.whenActivityActive.resource = null
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -66,18 +53,9 @@ class MainActivity : AppCompatActivity(), NotifyAdapter {
         return true
     }
 
-    override val containerId: Int
-        get() = R.id.fragmentContainer
-
     override fun notifyScreenUpdates() {
+        navigator.notifyScreenUpdates()
         val f = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
-
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            // more than 1 screen -> show back button in the toolbar
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        } else {
-            supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        }
 
         if (f is HasScreenTitle && f.getScreenTitle() != null) {
             // fragment has custom screen title -> display it
@@ -85,20 +63,10 @@ class MainActivity : AppCompatActivity(), NotifyAdapter {
         } else {
             supportActionBar?.title = getString(R.string.app_name)
         }
-
-        val result = activityViewModel.result.value?.getValue() ?: return
-        if (f is BaseFragment) {
-            // has result that can be delivered to the screen's view-model
-            f.viewModel.onResult(result)
-        }
     }
 
-    /**
-     * У [onFragmentViewCreated] сповіщуємо які зміни треба оновити
-     */
-    private val fragmentCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
-            notifyScreenUpdates()
-        }
+    override fun getActivityScopeViewModel(): CoreViewModel {
+        return activityViewModel
     }
+
 }
