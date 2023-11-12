@@ -1,10 +1,9 @@
 # Core - модуль документація
 
 ***Вимагає реалізувати 2 контракти для роботи:***
+Вимагає реалізувати 2 контракти для роботи:
 - ModelsProvider - провайдер залежностей для ViewModelFactory
-- NotifyAdapter
-  - _notifyScreenUpdates_ - контракт з Activity для апдейту компонентів Activity
-  - _containerId_ -  доставка containerId у ViewModelFactory.
+- FragmentsHolder - контракт для Activity який підключає навігацію.
 
 
 > Також має наступні контракти для роботи через _CoreViewModel_
@@ -31,89 +30,85 @@ class App: Application(), ModelsProvider {
 }
 ```
 
-**NotifyAdapter**
+**FragmentsHolder**
 
-1. Додаемо CoreViewModel
-2. Додаемо fragmentCallbacks
-3. Рееструемо fragmentCallbacks в onCreate, також відписуемось в onDestroy
-4. Передаемо у вьюмодель посилання на Activity в onResume, та відпис. у onPause
-5. Прокидуємо далі з фрагменту результат у вьюмодель
-6. Прокидуемо id на fragmentContainer
+1. Створити [CoreViewModel] так передати UIActions та NavigatorManager
+2. Оголосити сам навігатор, типу [StackFragmentNavigator]
+3. Створити StackFragmentNavigator в onCreate
+4.  У notifyScreenUpdates прокинути navigator.notifyScreenUpdates()
+5. Повернути єкземпляр класу [CoreViewModel] до Core модулю
 
 _MainActivity.kt_
 ```
 /**
  * Приклад реалізації Activity
  */
-class MainActivity : AppCompatActivity(), NotifyAdapter {
+class MainActivity : AppCompatActivity(), FragmentsHolder {
 
-    /**
-     * 1. Додається [CoreViewModel] та далі рееструється callback
-     * на життевий цикл
-     */
-    private val activityViewModel by viewModels<CoreViewModel> {
-        ViewModelProvider.AndroidViewModelFactory(application)
+/**
+* 2. Оголосити сам навігатор, типу [StackFragmentNavigator]
+*/
+    private lateinit var navigator: StackFragmentNavigator
+
+/**
+* 1. Створити [CoreViewModel] так передати UIActions та 
+* NavigatorManager
+*/
+    private val activityViewModel by viewModelCreator<CoreViewModel> {
+        CoreViewModel(
+            uiActions = AndroidUIActions(applicationContext),
+            navigatorManager = NavigatorManager(),
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
-            // початковий єкран якщо додаток відкрито вперше
-            activityViewModel.launchFragment(
-                activity = this,
-                screen = CurrentColorFragment.Screen(),
-                addToBackStack = false
-            )
-        }
+        // 3. Створити StackFragmentNavigator в onCreate
+        navigator = StackFragmentNavigator(
+            activity = this,
+            navigatorManager = activityViewModel.navigatorManager,
+            savedInstanceState = savedInstanceState,
+            containerId = R.id.fragmentContainer,
+            animations = Animations(
+                enterAnim = R.anim.enter,
+                exitAnim = R.anim.exit,
+                popEnterAnim = R.anim.pop_enter,
+                popExitAnim = R.anim.pop_exit
+            ),
+            initialScreenCreator = { CurrentColorFragment.Screen() }
+        )
 
-        // 3. реєстрація життевого циклу фрагменту
-        supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallbacks, false)
     }
 
-    override fun onDestroy() {
-        // 3. відписка від життевого циклу фрагменту
-        supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentCallbacks)
-        super.onDestroy()
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
-    override fun onResume() {
-        super.onResume()
-        // 4. стає можливою навігація лише якщо acivity існує
-        activityViewModel.whenActivityActive.resource = this
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // 4. стираємо посилання на acivity
-        activityViewModel.whenActivityActive.resource = null
-    }
-    
-    /**
-     * 6. Прокидуемо id на fragmentContainer
-     */
-    override val containerId: Int
-        get() = R.id.fragmentContainer
-
+/**
+* 4. У notifyScreenUpdates прокинути navigator.notifyScreenUpdates()
+*/
     override fun notifyScreenUpdates() {
+        navigator.notifyScreenUpdates()
         val f = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
-        
-        val result = activityViewModel.result.value?.getValue() ?: return
-        if (f is BaseFragment) {
-            // 5. Якщо з єкрану повертається результат, передаємо до вьюмоделі
-            f.viewModel.onResult(result)
+
+        if (f is HasScreenTitle && f.getScreenTitle() != null) {
+            // fragment has custom screen title -> display it
+            supportActionBar?.title = f.getScreenTitle()
+        } else {
+            supportActionBar?.title = getString(R.string.app_name)
         }
     }
 
-    /**
-     * 2. У [onFragmentViewCreated] сповіщуємо які зміни треба оновити
-     */
-    private val fragmentCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
-            notifyScreenUpdates()
-        }
+/**
+* 5. Повернути єкземпляр класу [CoreViewModel] до Core модулю
+*/
+    override fun getActivityScopeViewModel(): CoreViewModel {
+        return activityViewModel
     }
+
 }
 ```
 
