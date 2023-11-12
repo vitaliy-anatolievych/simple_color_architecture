@@ -1,11 +1,9 @@
 package com.study.core.viewmodels
 
-import android.app.Application
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import com.study.core.R
 import com.study.core.contracts.Navigator
 import com.study.core.contracts.NotifyAdapter
@@ -18,8 +16,10 @@ import com.study.core.views.LiveEvent
 import com.study.core.views.MutableLiveEvent
 
 open class CoreViewModel(
-    private val application: Application
-): AndroidViewModel(application), Navigator, UiActions {
+    private val uiActions: UiActions
+): ViewModel(),
+    Navigator,
+    UiActions by uiActions {
 
     val whenActivityActive = ResourceActions<AppCompatActivity>()
 
@@ -35,14 +35,6 @@ open class CoreViewModel(
             _result.value = Event(result)
         }
         it.onBackPressed()
-    }
-
-    override fun toast(message: String) {
-        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun getString(messageRes: Int, vararg args: Any): String {
-        return application.getString(messageRes, *args)
     }
 
     fun launchFragment(activity: AppCompatActivity, screen: BaseScreen, addToBackStack: Boolean = true) {
