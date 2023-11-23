@@ -9,6 +9,8 @@ import com.study.core.views.BaseFragment
 import com.study.core.views.BaseScreen
 import com.study.core.views.screenViewModel
 import com.study.simplecolorsarchitecture.databinding.FragmentCurrentColorBinding
+import com.study.simplecolorsarchitecture.views.screens.utils.onTryAgain
+import com.study.simplecolorsarchitecture.views.screens.utils.renderSimpleResult
 
 
 /**
@@ -31,15 +33,23 @@ class CurrentColorFragment : BaseFragment() {
             FragmentCurrentColorBinding.inflate(inflater, container, false)
 
         with(binding) {
-
-            viewModel.currentColor.observe(viewLifecycleOwner) {
-                colorView.setBackgroundColor(it.value)
+            viewModel.currentColor.observe(viewLifecycleOwner) { result ->
+                renderSimpleResult(
+                    root = binding.root,
+                    result = result,
+                    onSuccess = {
+                        colorView.setBackgroundColor(it.value)
+                    }
+                )
             }
 
             changeColorButton.setOnClickListener {
                 viewModel.changeColor()
             }
 
+            onTryAgain(root) {
+                viewModel.tryAgain()
+            }
         }
 
         return binding.root

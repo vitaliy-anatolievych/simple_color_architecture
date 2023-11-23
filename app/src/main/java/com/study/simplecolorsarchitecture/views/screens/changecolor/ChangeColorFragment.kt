@@ -12,9 +12,10 @@ import com.study.core.views.screenViewModel
 import com.study.simplecolorsarchitecture.R
 import com.study.simplecolorsarchitecture.databinding.FragmentChangeColorBinding
 import com.study.simplecolorsarchitecture.views.contracts.HasScreenTitle
+import com.study.simplecolorsarchitecture.views.screens.utils.renderSimpleResult
 import org.intellij.lang.annotations.Identifier
 
-class ChangeColorFragment: BaseFragment(), HasScreenTitle {
+class ChangeColorFragment : BaseFragment(), HasScreenTitle {
 
     class Screen(@Identifier val id: Long) : BaseScreen
 
@@ -35,8 +36,13 @@ class ChangeColorFragment: BaseFragment(), HasScreenTitle {
         binding.saveButton.setOnClickListener { viewModel.onSavePressed() }
         binding.cancelButton.setOnClickListener { viewModel.onCancelPressed() }
 
-        viewModel.colorsList.observe(viewLifecycleOwner) {
-            adapter.items = it
+        viewModel.colorsList.observe(viewLifecycleOwner) { result ->
+            renderSimpleResult(
+                root = binding.root,
+                result = result
+            ) {
+                adapter.items = it
+            }
         }
         viewModel.screenTitle.observe(viewLifecycleOwner) {
             // if screen title is changed -> need to notify activity about updates
@@ -48,14 +54,16 @@ class ChangeColorFragment: BaseFragment(), HasScreenTitle {
 
     private fun setupLayoutManager(binding: FragmentChangeColorBinding, adapter: ColorsAdapter) {
         // waiting for list width
-        binding.colorsRecyclerView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                binding.colorsRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                val width = binding.colorsRecyclerView.width
+                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val width = binding.root.width
                 val itemWidth = resources.getDimensionPixelSize(R.dimen.item_width)
                 val columns = width / itemWidth
                 binding.colorsRecyclerView.adapter = adapter
-                binding.colorsRecyclerView.layoutManager = GridLayoutManager(requireContext(), columns)
+                binding.colorsRecyclerView.layoutManager =
+                    GridLayoutManager(requireContext(), columns)
             }
         })
     }
