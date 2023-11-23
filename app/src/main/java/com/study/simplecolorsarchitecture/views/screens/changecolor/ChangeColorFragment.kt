@@ -12,6 +12,7 @@ import com.study.core.views.screenViewModel
 import com.study.simplecolorsarchitecture.R
 import com.study.simplecolorsarchitecture.databinding.FragmentChangeColorBinding
 import com.study.simplecolorsarchitecture.views.contracts.HasScreenTitle
+import com.study.simplecolorsarchitecture.views.screens.utils.onTryAgain
 import com.study.simplecolorsarchitecture.views.screens.utils.renderSimpleResult
 import org.intellij.lang.annotations.Identifier
 
@@ -47,6 +48,10 @@ class ChangeColorFragment : BaseFragment(), HasScreenTitle {
         viewModel.screenTitle.observe(viewLifecycleOwner) {
             // if screen title is changed -> need to notify activity about updates
             notifyScreenUpdates()
+        }
+
+        onTryAgain(root = binding.root) {
+            viewModel.tryAgain()
         }
 
         return binding.root

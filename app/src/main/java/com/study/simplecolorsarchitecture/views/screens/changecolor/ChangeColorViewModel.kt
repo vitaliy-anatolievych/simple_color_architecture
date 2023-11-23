@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.study.core.contracts.Navigator
 import com.study.core.contracts.UiActions
+import com.study.core.utils.ErrorResult
 import com.study.core.utils.PendingResult
 import com.study.core.utils.SuccessResult
 import com.study.core.views.BaseViewModel
@@ -18,6 +19,7 @@ import com.study.simplecolorsarchitecture.model.colors.NamedColor
 import com.study.simplecolorsarchitecture.views.screens.utils.Transformations
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class ChangeColorViewModel(
     screen: ChangeColorFragment.Screen,
@@ -48,7 +50,8 @@ class ChangeColorViewModel(
     init {
         viewModelScope.launch {
             delay(1000)
-            _availableColors.value = SuccessResult(colorsRepository.getAvailableColors())
+            _availableColors.value = ErrorResult(Exception())
+//            _availableColors.value = SuccessResult(colorsRepository.getAvailableColors())
         }
         // initializing MediatorLiveData
         _colorsList.addSource(_availableColors) { mergeSources() }
@@ -82,6 +85,14 @@ class ChangeColorViewModel(
 
         _colorsList.value = colors.map { colorsList ->
             colorsList.map { NamedColorListItem(it, currentColorId == it.id) }
+        }
+    }
+
+    fun tryAgain() {
+        viewModelScope.launch {
+            _availableColors.postValue(PendingResult())
+            delay(1000)
+            _availableColors.postValue(SuccessResult(colorsRepository.getAvailableColors()))
         }
     }
 
