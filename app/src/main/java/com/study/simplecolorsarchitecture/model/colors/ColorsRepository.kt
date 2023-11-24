@@ -1,5 +1,6 @@
 package com.study.simplecolorsarchitecture.model.colors
 
+import com.study.core.model.tasks.Tasks
 import com.study.simplecolorsarchitecture.model.Repository
 
 typealias ColorListener = (NamedColor) -> Unit
@@ -11,17 +12,15 @@ typealias ColorListener = (NamedColor) -> Unit
  */
 interface ColorsRepository : Repository {
 
-    var currentColor: NamedColor
-
     /**
      * Get the list of all available colors that may be chosen by the user.
      */
-    fun getAvailableColors(): List<NamedColor>
+    fun getAvailableColors(): Tasks<List<NamedColor>>
 
     /**
      * Get the color content by its ID
      */
-    fun getById(id: Long): NamedColor
+    fun getById(id: Long): Tasks<NamedColor>
 
     /**
      * Listen for the current color changes.
@@ -33,5 +32,9 @@ interface ColorsRepository : Repository {
      * Stop listening for the current color changes
      */
     fun removeListener(listener: ColorListener)
+
+    fun getCurrentColor(): Tasks<NamedColor>
+
+    fun setCurrentColor(color: NamedColor): Tasks<Unit>
 
 }
