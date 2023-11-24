@@ -6,7 +6,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.study.core.contracts.Navigator
 import com.study.core.contracts.UiActions
-import com.study.core.utils.ErrorResult
 import com.study.core.utils.PendingResult
 import com.study.core.utils.SuccessResult
 import com.study.core.views.BaseViewModel
@@ -19,7 +18,6 @@ import com.study.simplecolorsarchitecture.model.colors.NamedColor
 import com.study.simplecolorsarchitecture.views.screens.utils.Transformations
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class ChangeColorViewModel(
     screen: ChangeColorFragment.Screen,
@@ -96,4 +94,9 @@ class ChangeColorViewModel(
         }
     }
 
+    data class ViewState(
+        val colorsList: List<NamedColorListItem>,
+        val showSaveButton: Boolean,
+        val showCancelButton: Boolean
+    )
 }
