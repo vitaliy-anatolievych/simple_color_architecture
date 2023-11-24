@@ -50,8 +50,8 @@ class ChangeColorViewModel(
     init {
         viewModelScope.launch {
             delay(1000)
-            _availableColors.value = ErrorResult(Exception())
-//            _availableColors.value = SuccessResult(colorsRepository.getAvailableColors())
+//            _availableColors.value = ErrorResult(Exception())
+            _availableColors.value = SuccessResult(colorsRepository.getAvailableColors())
         }
         // initializing MediatorLiveData
         _colorsList.addSource(_availableColors) { mergeSources() }

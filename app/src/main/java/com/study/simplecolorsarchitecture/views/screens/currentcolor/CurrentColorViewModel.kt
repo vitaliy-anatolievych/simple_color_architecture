@@ -10,11 +10,14 @@ import com.study.core.utils.PendingResult
 import com.study.core.utils.SuccessResult
 import com.study.core.utils.takeSuccess
 import com.study.core.views.BaseViewModel
+import com.study.core.views.LiveResult
+import com.study.core.views.MediatorLiveResult
 import com.study.core.views.MutableLiveResult
 import com.study.simplecolorsarchitecture.R
 import com.study.simplecolorsarchitecture.model.colors.ColorsRepository
 import com.study.simplecolorsarchitecture.model.colors.NamedColor
 import com.study.simplecolorsarchitecture.views.screens.changecolor.ChangeColorFragment
+import com.study.simplecolorsarchitecture.views.screens.changecolor.NamedColorListItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -26,16 +29,23 @@ class CurrentColorViewModel(
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
+    // input sources
+    private val _currentColorState: MutableLiveResult<NamedColor> =
+        MutableLiveResult(PendingResult())
     private val _currentColor: MutableLiveData<NamedColor> =
         savedStateHandle.getLiveData(CURRENT_COLOR, colorsRepository.currentColor)
 
-    val currentColor: MutableLiveResult<NamedColor> = MutableLiveResult(PendingResult())
+
+    private val _colorMediator = MediatorLiveResult<NamedColor>()
+    val currentColor: LiveResult<NamedColor> = _colorMediator
+
 
     init {
-        viewModelScope.launch {
-            delay(2000)
-            currentColor.postValue(ErrorResult(Exception()))
-        }
+        _currentColorState.value =
+            SuccessResult(_currentColor.value ?: colorsRepository.currentColor)
+
+        _colorMediator.addSource(_currentColor) { mergeSources() }
+        _colorMediator.addSource(_currentColorState) { mergeSources() }
     }
 
     override fun onResult(result: Any) {
@@ -43,7 +53,7 @@ class CurrentColorViewModel(
         if (result is NamedColor) {
             val message = uiActions.getString(R.string.changed_color, result.name)
             uiActions.toast(message)
-            currentColor.postValue(SuccessResult(result))
+            _currentColorState.postValue(SuccessResult(result))
         }
     }
 
@@ -53,15 +63,25 @@ class CurrentColorViewModel(
         navigator.launch(screen)
     }
 
+    private fun mergeSources() {
+        val currentColor = _currentColor.value ?: return
+        val currentColorState = _currentColorState.value ?: return
+
+        _colorMediator.value = currentColorState.map { color ->
+            _currentColor.postValue(color)
+            currentColor
+        }
+    }
+
     fun tryAgain() {
         // todo: mocking long-running reloading for view
         viewModelScope.launch {
-            currentColor.postValue(PendingResult())
+            _currentColorState.postValue(PendingResult())
             delay(2000)
             currentColor.value.takeSuccess().runCatching {
-                currentColor.postValue(SuccessResult(this ?: colorsRepository.currentColor))
+                _currentColorState.postValue(SuccessResult(this ?: colorsRepository.currentColor))
             }.onFailure {
-                currentColor.postValue(ErrorResult(Exception()))
+                _currentColorState.postValue(ErrorResult(Exception()))
             }
         }
     }
