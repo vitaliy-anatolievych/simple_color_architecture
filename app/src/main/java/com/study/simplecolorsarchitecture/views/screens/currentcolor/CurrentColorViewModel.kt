@@ -5,10 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.study.core.contracts.Navigator
 import com.study.core.contracts.UiActions
-import com.study.core.utils.ErrorResult
-import com.study.core.utils.PendingResult
-import com.study.core.utils.SuccessResult
-import com.study.core.utils.takeSuccess
+import com.study.core.model.ErrorResult
+import com.study.core.model.PendingResult
+import com.study.core.model.SuccessResult
+import com.study.core.model.takeSuccess
 import com.study.core.views.BaseViewModel
 import com.study.core.views.LiveResult
 import com.study.core.views.MediatorLiveResult
@@ -17,7 +17,6 @@ import com.study.simplecolorsarchitecture.R
 import com.study.simplecolorsarchitecture.model.colors.ColorsRepository
 import com.study.simplecolorsarchitecture.model.colors.NamedColor
 import com.study.simplecolorsarchitecture.views.screens.changecolor.ChangeColorFragment
-import com.study.simplecolorsarchitecture.views.screens.changecolor.NamedColorListItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.Exception

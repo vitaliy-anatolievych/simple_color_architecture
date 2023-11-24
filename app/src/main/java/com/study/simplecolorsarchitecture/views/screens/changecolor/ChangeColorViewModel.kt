@@ -7,8 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.study.core.contracts.Navigator
 import com.study.core.contracts.UiActions
-import com.study.core.utils.PendingResult
-import com.study.core.utils.SuccessResult
+import com.study.core.model.PendingResult
+import com.study.core.model.SuccessResult
 import com.study.core.views.BaseViewModel
 import com.study.core.views.LiveResult
 import com.study.core.views.MediatorLiveResult

@@ -1,4 +1,4 @@
-package com.study.core.utils
+package com.study.core.model
 
 typealias Mapper<Input, Output> = (Input) -> Output
 
@@ -14,15 +14,20 @@ sealed class Result<T> {
     }
 }
 
+/**
+ * Для того щоб помітити лише результати поточності
+ */
+sealed class FinalResult<T> : Result<T>()
+
 class PendingResult<T> : Result<T>()
 
 class SuccessResult<T>(
     val data: T
-) : Result<T>()
+) : FinalResult<T>()
 
 class ErrorResult<T>(
     val exception: Exception
-) : Result<T>()
+) : FinalResult<T>()
 
 
 fun <T> Result<T>?.takeSuccess(): T? {

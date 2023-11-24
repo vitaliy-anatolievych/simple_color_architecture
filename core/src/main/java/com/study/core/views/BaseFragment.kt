@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import com.study.core.contracts.FragmentsHolder
-import com.study.core.utils.ErrorResult
-import com.study.core.utils.PendingResult
-import com.study.core.utils.Result
-import com.study.core.utils.SuccessResult
+import com.study.core.model.ErrorResult
+import com.study.core.model.PendingResult
+import com.study.core.model.Result
+import com.study.core.model.SuccessResult
 
 /**
  * Базовий клас для усіх фрагментів
