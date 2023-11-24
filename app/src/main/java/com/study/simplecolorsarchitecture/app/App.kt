@@ -11,7 +11,7 @@ class App: Application(), ModelsProvider {
 
     private val dependency = listOf<Any>(
         tasksFactory,
-        InMemoryColorsRepository()
+        InMemoryColorsRepository(tasksFactory)
     )
 
     override val models: List<Any>
