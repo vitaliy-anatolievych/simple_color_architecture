@@ -7,7 +7,7 @@ import androidx.core.view.children
 import com.study.core.views.BaseFragment
 import com.study.simplecolorsarchitecture.R
 import com.study.simplecolorsarchitecture.databinding.PartResultBinding
-import com.study.core.utils.Result
+import com.study.core.model.Result
 
 /**
  * Default [Result] rendering.
