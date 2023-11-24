@@ -2,10 +2,8 @@ package com.study.simplecolorsarchitecture.views.screens.currentcolor
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.study.core.contracts.Navigator
 import com.study.core.contracts.UiActions
-import com.study.core.model.ErrorResult
 import com.study.core.model.PendingResult
 import com.study.core.model.SuccessResult
 import com.study.core.model.takeSuccess
@@ -17,9 +15,6 @@ import com.study.simplecolorsarchitecture.R
 import com.study.simplecolorsarchitecture.model.colors.ColorsRepository
 import com.study.simplecolorsarchitecture.model.colors.NamedColor
 import com.study.simplecolorsarchitecture.views.screens.changecolor.ChangeColorFragment
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class CurrentColorViewModel(
     private val navigator: Navigator,
@@ -32,7 +27,7 @@ class CurrentColorViewModel(
     private val _currentColorState: MutableLiveResult<NamedColor> =
         MutableLiveResult(PendingResult())
     private val _currentColor: MutableLiveData<NamedColor> =
-        savedStateHandle.getLiveData(CURRENT_COLOR, colorsRepository.currentColor)
+        savedStateHandle.getLiveData(CURRENT_COLOR, colorsRepository.getCurrentColor().await())
 
 
     private val _colorMediator = MediatorLiveResult<NamedColor>()
@@ -40,8 +35,7 @@ class CurrentColorViewModel(
 
 
     init {
-        _currentColorState.value =
-            SuccessResult(_currentColor.value ?: colorsRepository.currentColor)
+        load()
 
         _colorMediator.addSource(_currentColor) { mergeSources() }
         _colorMediator.addSource(_currentColorState) { mergeSources() }
@@ -73,17 +67,13 @@ class CurrentColorViewModel(
     }
 
     fun tryAgain() {
-        // todo: mocking long-running reloading for view
-        viewModelScope.launch {
-            _currentColorState.postValue(PendingResult())
-            delay(2000)
-            currentColor.value.takeSuccess().runCatching {
-                _currentColorState.postValue(SuccessResult(this ?: colorsRepository.currentColor))
-            }.onFailure {
-                _currentColorState.postValue(ErrorResult(Exception()))
-            }
-        }
+        load()
     }
+
+    private fun load() {
+        colorsRepository.getCurrentColor().into(_currentColorState)
+    }
+
 
     companion object {
         private const val CURRENT_COLOR = "currentColor"
