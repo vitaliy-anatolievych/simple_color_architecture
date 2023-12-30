@@ -3,6 +3,11 @@ package com.study.simplecolorsarchitecture.model.colors
 import android.graphics.Color
 import com.study.core.model.tasks.Tasks
 import com.study.core.model.tasks.TasksFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 /**
  * Simple in-memory implementation of [ColorsRepository]
@@ -38,13 +43,21 @@ class InMemoryColorsRepository(
         return@async currentColor
     }
 
-    override fun setCurrentColor(color: NamedColor): Tasks<Unit> = tasksFactory.async {
-        Thread.sleep(1000)
+    override fun setCurrentColor(color: NamedColor): Flow<Int> = flow {
         if (currentColor != color) {
+            var progress = 0
+            while (progress < 100) {
+                progress += 2
+                delay(30)
+                emit(progress) // публікація результату
+            }
+            // код виконується після while
             currentColor = color
             listeners.forEach { it(color) }
+        } else {
+            emit(100)
         }
-    }
+    }.flowOn(Dispatchers.IO) // зміна контексту для коду в коллбеку, за замовчуванням Main
 
     companion object {
         private val AVAILABLE_COLORS = listOf(

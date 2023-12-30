@@ -2,6 +2,7 @@ package com.study.simplecolorsarchitecture.model.colors
 
 import com.study.core.model.tasks.Tasks
 import com.study.simplecolorsarchitecture.model.Repository
+import kotlinx.coroutines.flow.Flow
 
 typealias ColorListener = (NamedColor) -> Unit
 
@@ -35,6 +36,6 @@ interface ColorsRepository : Repository {
 
     fun getCurrentColor(): Tasks<NamedColor>
 
-    fun setCurrentColor(color: NamedColor): Tasks<Unit>
+    fun setCurrentColor(color: NamedColor): Flow<Int>
 
 }
