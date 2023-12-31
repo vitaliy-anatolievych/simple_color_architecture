@@ -15,6 +15,7 @@ import com.study.core.views.screenViewModel
 import com.study.simplecolorsarchitecture.R
 import com.study.simplecolorsarchitecture.databinding.FragmentChangeColorBinding
 import com.study.simplecolorsarchitecture.views.contracts.HasScreenTitle
+import com.study.simplecolorsarchitecture.views.screens.utils.collectFlow
 import com.study.simplecolorsarchitecture.views.screens.utils.onTryAgain
 import com.study.simplecolorsarchitecture.views.screens.utils.renderSimpleResult
 import kotlinx.coroutines.launch
@@ -41,26 +42,19 @@ class ChangeColorFragment : BaseFragment(), HasScreenTitle {
         binding.saveButton.setOnClickListener { viewModel.onSavePressed() }
         binding.cancelButton.setOnClickListener { viewModel.onCancelPressed() }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            // код буде працювати тут доки живий інтерфейс фрагменту
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // цей метод буде працювати у скоупі від вказанного до протилежного
-                // Lifecycle.State.STARTED(onStart) ->
-                viewModel.viewState.collect { result ->
-                    renderSimpleResult(
-                        root = binding.root,
-                        result = result
-                    ) { viewState ->
-                        adapter.items = viewState.colorsList
-                        with(binding) {
-                            saveButton.visibility =
-                                if (viewState.showSaveButton) View.VISIBLE else View.INVISIBLE
-                            cancelButton.visibility =
-                                if (viewState.showCancelButton) View.VISIBLE else View.INVISIBLE
-                            changeProgressBar.visibility =
-                                if (viewState.showProgressBar) View.VISIBLE else View.GONE
-                        }
-                    }
+        collectFlow(viewModel.viewState) { result ->
+            renderSimpleResult(
+                root = binding.root,
+                result = result
+            ) { viewState ->
+                adapter.items = viewState.colorsList
+                with(binding) {
+                    saveButton.visibility =
+                        if (viewState.showSaveButton) View.VISIBLE else View.INVISIBLE
+                    cancelButton.visibility =
+                        if (viewState.showCancelButton) View.VISIBLE else View.INVISIBLE
+                    changeProgressBar.visibility =
+                        if (viewState.showProgressBar) View.VISIBLE else View.GONE
                 }
             }
         }
