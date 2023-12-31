@@ -16,7 +16,7 @@ interface ColorsRepository : Repository {
     /**
      * Get the list of all available colors that may be chosen by the user.
      */
-    fun getAvailableColors(): Tasks<List<NamedColor>>
+    suspend fun getAvailableColors(): List<NamedColor>
 
     /**
      * Get the color content by its ID

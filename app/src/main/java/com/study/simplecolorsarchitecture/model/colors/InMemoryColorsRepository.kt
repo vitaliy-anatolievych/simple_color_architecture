@@ -46,9 +46,9 @@ class InMemoryColorsRepository(
         }
     }.buffer(Channel.CONFLATED) // віддає останній результат з буферу
 
-    override fun getAvailableColors(): Tasks<List<NamedColor>> = tasksFactory.async {
-        Thread.sleep(1000)
-        return@async AVAILABLE_COLORS
+    override suspend fun getAvailableColors(): List<NamedColor> = withContext(Dispatchers.IO) {
+        delay(1000)
+        return@withContext AVAILABLE_COLORS
     }
 
     override suspend fun getById(id: Long): NamedColor = withContext(Dispatchers.IO) {
