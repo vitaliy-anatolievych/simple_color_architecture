@@ -90,7 +90,7 @@ open class BaseViewModel: ViewModel() {
      * !! зациклювання між viewModelScope не буде, бо MutableStateFlow нічого не робить
      * якщо значення однакові !!
      */
-    fun <T> SavedStateHandle.getStateFlow(key: String, initValue: T): MutableStateFlow<T> {
+    fun <T> SavedStateHandle.getCustomStateFlow(key: String, initValue: T): MutableStateFlow<T> {
         // щоб не путати this@SavedStateHandle та this@BaseViewModel
         val savedStateHandle = this
 
