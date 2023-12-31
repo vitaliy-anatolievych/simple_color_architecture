@@ -21,7 +21,7 @@ interface ColorsRepository : Repository {
     /**
      * Get the color content by its ID
      */
-    fun getById(id: Long): Tasks<NamedColor>
+    suspend fun getById(id: Long): NamedColor
 
     /**
      * Слухач поточного кольору

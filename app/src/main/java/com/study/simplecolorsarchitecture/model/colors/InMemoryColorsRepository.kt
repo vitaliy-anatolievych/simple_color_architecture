@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 /**
  * Simple in-memory implementation of [ColorsRepository]
@@ -50,9 +51,9 @@ class InMemoryColorsRepository(
         return@async AVAILABLE_COLORS
     }
 
-    override fun getById(id: Long): Tasks<NamedColor> = tasksFactory.async {
-        Thread.sleep(1000)
-        return@async AVAILABLE_COLORS.first { it.id == id }
+    override suspend fun getById(id: Long): NamedColor = withContext(Dispatchers.IO) {
+        delay(1000)
+        return@withContext AVAILABLE_COLORS.first { it.id == id }
     }
 
     override fun getCurrentColor(): Tasks<NamedColor> = tasksFactory.async {
