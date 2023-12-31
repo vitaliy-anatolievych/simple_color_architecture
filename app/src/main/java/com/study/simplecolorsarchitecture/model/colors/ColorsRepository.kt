@@ -24,15 +24,9 @@ interface ColorsRepository : Repository {
     fun getById(id: Long): Tasks<NamedColor>
 
     /**
-     * Listen for the current color changes.
-     * The listener is triggered immediately with the current value when calling this method.
+     * Слухач поточного кольору
      */
-    fun addListener(listener: ColorListener)
-
-    /**
-     * Stop listening for the current color changes
-     */
-    fun removeListener(listener: ColorListener)
+    fun listenCurrentColor(): Flow<NamedColor>
 
     fun getCurrentColor(): Tasks<NamedColor>
 

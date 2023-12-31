@@ -4,8 +4,12 @@ import android.graphics.Color
 import com.study.core.model.tasks.Tasks
 import com.study.core.model.tasks.TasksFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
@@ -20,13 +24,26 @@ class InMemoryColorsRepository(
 
     private val listeners = mutableSetOf<ColorListener>()
 
-    override fun addListener(listener: ColorListener) {
-        listeners += listener
-    }
+    override fun listenCurrentColor(): Flow<NamedColor> = callbackFlow {
+        val listener: ColorListener = {
+            /**
+             * Особливість методу [trySend] у тому що він повертає [ChannelResult]
+             * що дозволяє дізнатись результат виконання Flow: isSuccess, isFailure, isClosed.
+             */
+            trySend(it)
+        }
 
-    override fun removeListener(listener: ColorListener) {
-        listeners -= listener
-    }
+        listeners.add(listener)
+
+        /**
+         * Оскільки Cold Flow завершується одразу як виконає свою роботу код усередині,
+         * [awaitClose] зупиняє виконання коллебеку у собі, та очікує доки не завершиться
+         * зовнішня корутина, після чого виконає код у собі перед завершенням зовнішньої корутини.
+         */
+        awaitClose {
+            listeners.remove(listener)
+        }
+    }.buffer(Channel.CONFLATED) // віддає останній результат з буферу
 
     override fun getAvailableColors(): Tasks<List<NamedColor>> = tasksFactory.async {
         Thread.sleep(1000)
