@@ -3,12 +3,18 @@ package com.study.core.views
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import com.study.core.model.PendingResult
 import com.study.core.utils.Event
 import com.study.core.model.Result
 import com.study.core.model.tasks.TaskListener
 import com.study.core.model.tasks.Tasks
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 typealias LiveEvent<T> = LiveData<Event<T>>
 typealias MutableLiveEvent<T> = MutableLiveData<Event<T>>
@@ -63,5 +69,39 @@ open class BaseViewModel: ViewModel() {
         this.safeEnqueue {
             liveResult.value = it
         }
+    }
+
+    /**
+     * Flow розширення для заміни savedStateHandle.getLiveData()
+     * !! зациклювання між viewModelScope не буде, бо MutableStateFlow нічого не робить
+     * якщо значення однакові !!
+     */
+    fun <T> SavedStateHandle.getStateFlow(key: String, initValue: T): MutableStateFlow<T> {
+        // щоб не путати this@SavedStateHandle та this@BaseViewModel
+        val savedStateHandle = this
+
+        // Беремо по ключу значення
+        val mutableFlow = MutableStateFlow(savedStateHandle[key] ?: initValue)
+
+        // слухаемо mutableFlow
+        viewModelScope.launch {
+            // слухаемо що прийшло з mutableFlow та записуємо в savedStateHandle
+            mutableFlow.collect {
+                savedStateHandle[key] = it
+            }
+        }
+
+        // слухаемо savedStateHandle
+        viewModelScope.launch {
+            savedStateHandle.getLiveData<T>(key).asFlow().collect {
+                /**
+                 * Як сзовні хтось оновить значення в savedStateHandle,
+                 * то ми парралельно це теж перехопимо та сповістимо про зміни
+                 */
+                mutableFlow.value = it
+            }
+        }
+
+        return mutableFlow
     }
 }
