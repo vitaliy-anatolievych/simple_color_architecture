@@ -16,6 +16,7 @@ import com.study.core.model.tasks.TaskListener
 import com.study.core.model.tasks.Tasks
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -75,7 +76,7 @@ open class BaseViewModel: ViewModel() {
     }
 
 
-    fun <T> Tasks<T>.into(stateFlow: MutableStateFlow<Result<T>>, block: suspend () -> T) {
+    fun <T> into(stateFlow: MutableStateFlow<Result<T>>, block: suspend () -> T) {
         viewModelScope.launch {
             try {
                 stateFlow.value = SuccessResult(block())
