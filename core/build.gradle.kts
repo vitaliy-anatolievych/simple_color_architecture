@@ -36,6 +36,15 @@ dependencies {
     api("androidx.activity:activity-ktx:1.8.0")
     api("androidx.fragment:fragment-ktx:1.6.2")
 
+    /**
+     * Для перетворення LiveData -> Flow
+     */
+    api("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+
+    /**
+     * Дозволяє корректно підписуватись на Flow на стороні Fragment\Activity
+     */
+    api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
