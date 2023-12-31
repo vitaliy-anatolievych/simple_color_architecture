@@ -2,6 +2,7 @@ package com.study.simplecolorsarchitecture.views.screens.currentcolor
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.study.core.contracts.Navigator
 import com.study.core.contracts.UiActions
 import com.study.core.model.PendingResult
@@ -15,6 +16,7 @@ import com.study.simplecolorsarchitecture.R
 import com.study.simplecolorsarchitecture.model.colors.ColorsRepository
 import com.study.simplecolorsarchitecture.model.colors.NamedColor
 import com.study.simplecolorsarchitecture.views.screens.changecolor.ChangeColorFragment
+import kotlinx.coroutines.launch
 
 class CurrentColorViewModel(
     private val navigator: Navigator,
@@ -35,6 +37,13 @@ class CurrentColorViewModel(
 
 
     init {
+        viewModelScope.launch {
+            colorsRepository.listenCurrentColor()
+                .collect {
+                    _currentColorState.postValue(SuccessResult(it))
+                }
+        }
+
         load()
 
         _colorMediator.addSource(_currentColor) { mergeSources() }
@@ -46,7 +55,6 @@ class CurrentColorViewModel(
         if (result is NamedColor) {
             val message = uiActions.getString(R.string.changed_color, result.name)
             uiActions.toast(message)
-            _currentColorState.postValue(SuccessResult(result))
         }
     }
 
