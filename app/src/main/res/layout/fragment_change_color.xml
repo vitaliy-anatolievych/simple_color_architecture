@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -37,15 +38,46 @@
         app:layout_constraintEnd_toStartOf="@id/saveButton"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <include layout="@layout/part_result" />
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/saveProgressGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="savingHintTextView, savingPercentageTextView, changeProgressBar" />
+
+    <TextView
+        android:id="@+id/savingHintTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/please_wait"
+        app:layout_constraintBottom_toTopOf="@id/changeProgressBar"
+        app:layout_constraintStart_toStartOf="@id/changeProgressBar" />
+
+    <TextView
+        android:id="@+id/savingPercentageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="100%"
+        android:textColor="@color/black"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/changeProgressBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/changeProgressBar" />
 
     <ProgressBar
         android:id="@+id/changeProgressBar"
-        android:layout_width="wrap_content"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:max="100"
         app:layout_constraintBottom_toBottomOf="@id/saveButton"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/savingPercentageTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/saveButton" />
+        app:layout_constraintTop_toTopOf="@id/saveButton"
+        tools:progress="33" />
+
+    <include layout="@layout/part_result" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

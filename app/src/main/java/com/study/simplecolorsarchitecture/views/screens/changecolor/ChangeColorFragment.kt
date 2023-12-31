@@ -53,8 +53,11 @@ class ChangeColorFragment : BaseFragment(), HasScreenTitle {
                         if (viewState.showSaveButton) View.VISIBLE else View.INVISIBLE
                     cancelButton.visibility =
                         if (viewState.showCancelButton) View.VISIBLE else View.INVISIBLE
-                    changeProgressBar.visibility =
+
+                    saveProgressGroup.visibility =
                         if (viewState.showProgressBar) View.VISIBLE else View.GONE
+                    changeProgressBar.progress = viewState.saveProgressPercentage
+                    savingPercentageTextView.text = viewState.saveProgressPercentageMessage
                 }
             }
         }
