@@ -7,11 +7,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.study.core.model.ErrorResult
 import com.study.core.model.PendingResult
 import com.study.core.utils.Event
 import com.study.core.model.Result
+import com.study.core.model.SuccessResult
 import com.study.core.model.tasks.TaskListener
 import com.study.core.model.tasks.Tasks
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -68,6 +71,17 @@ open class BaseViewModel: ViewModel() {
         liveResult.value = PendingResult()
         this.safeEnqueue {
             liveResult.value = it
+        }
+    }
+
+
+    fun <T> Tasks<T>.into(stateFlow: MutableStateFlow<Result<T>>, block: suspend () -> T) {
+        viewModelScope.launch {
+            try {
+                stateFlow.value = SuccessResult(block())
+            } catch (e: Exception) {
+                if (e !is CancellationException) stateFlow.value = ErrorResult(e)
+            }
         }
     }
 
